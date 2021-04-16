@@ -1,10 +1,8 @@
 const express = require('express');
 const campsiteRouter = express.Router();
 
-const usersRouter = express.Router();
-
 // when we go to localhost:3000/campsites use line 7 - 30
-campsiteRouter
+campsitesRouter
   .route('/')
   .all((req, res, next) => {
     res.statusCode = 200;
@@ -29,7 +27,7 @@ campsiteRouter
     res.end('Deleting all campsites');
   });
 
-campsiteRouter
+campsitesRouter
   .route('/:campsiteId')
   .all((req, res, next) => {
     res.statusCode = 200;
@@ -51,4 +49,4 @@ campsiteRouter
     res.send('This is a delete request');
   });
 
-module.exports = campsiteRouter;
+module.exports = campsitesRouter;
