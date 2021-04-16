@@ -1,5 +1,5 @@
 const express = require('express');
-const campsiteRouter = express.Router();
+const campsitesRouter = express.Router();
 
 // when we go to localhost:3000/campsites use line 7 - 30
 campsitesRouter
