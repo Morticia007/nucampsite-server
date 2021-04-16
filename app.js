@@ -6,7 +6,7 @@ const logger = require('morgan');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/usersRouter');
-const campsitesRouter = require('./routes/campsiteRouter');
+const campsitesRouter = require('./routes/campsitesRouter');
 const promotionsRouter = require('./routes/promotionsRouter');
 const partnersRouter = require('./routes/partnersRouter');
 
