@@ -4,6 +4,8 @@ const authenticate = require('../authenticate');
 
 const partnersRouter = express.Router();
 
+const authMiddleware = [authenticate.verifyUser, authenticate.verifyAdmin];
+
 partnersRouter
   .route('/')
   .get((req, res, next) => {
@@ -15,7 +17,7 @@ partnersRouter
       })
       .catch((err) => next(err));
   })
-  .post(authenticate.verifyUser, (req, res, next) => {
+  .post(authMiddleware, (req, res, next) => {
     Partners.create(req.body)
       .then((partners) => {
         console.log('Partners Created ', partners);
@@ -29,7 +31,7 @@ partnersRouter
     res.statusCode = 403;
     res.end('PUT operation not supported on /partners');
   })
-  .delete(authenticate.verifyUser, (req, res, next) => {
+  .delete(authMiddleware, (req, res, next) => {
     Partners.deleteMany()
       .then((response) => {
         res.statusCode = 200;
@@ -56,7 +58,7 @@ partnersRouter
       `POST operation not supported on /partners/${req.params.partnerId}`,
     );
   })
-  .put(authenticate.verifyUser, (req, res, next) => {
+  .put(authMiddleware, (req, res, next) => {
     Partners.findByIdAndUpdate(
       req.params.partnerId,
       {
@@ -71,7 +73,7 @@ partnersRouter
       })
       .catch((err) => next(err));
   })
-  .delete(authenticate.verifyUser, (req, res, next) => {
+  .delete(authMiddleware, (req, res, next) => {
     Partners.findByIdAndDelete(req.params.partnerId)
       .then((response) => {
         res.statusCode = 200;
