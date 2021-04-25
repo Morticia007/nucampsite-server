@@ -3,12 +3,6 @@ const passport = require('passport');
 const User = require('../models/user');
 const authenticate = require('../authenticate');
 const router = express.Router();
-// Allow admins to access users documents:
-// Activate the /users path for GET requests in the usersRouter
-// (/routes/users.js). When a GET request is sent to the /users path,
-//  respond by checking if the request is from an admin user.
-//  If so, then return the details of all existing user documents.
-// Ordinary users should be unable to reach the GET /users endpoint.
 
 const authMiddleware = [authenticate.verifyUser, authenticate.verifyAdmin];
 
