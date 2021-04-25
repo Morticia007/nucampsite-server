@@ -194,14 +194,6 @@ campsiteRouter
     );
   })
   .put(authenticate.verifyUser, (req, res, next) => {
-    console.log({
-      line: '197',
-      user: req.user,
-      _id: req.user._id,
-      method: 'get',
-      route: '/:campsiteId/comments/:commentId',
-    });
-
     Campsite.findById(req.params.campsiteId)
       .then((campsite) => {
         const commentToEdit = campsite.comments.id(req.params.commentId);
@@ -213,6 +205,7 @@ campsiteRouter
               'User id does not match and this user cannot edit this comment',
           };
           next(err);
+          return;
         }
 
         if (campsite && campsite.comments.id(req.params.commentId)) {
@@ -242,9 +235,21 @@ campsiteRouter
       })
       .catch((err) => next(err));
   })
-  .delete(authMiddleware, (req, res, next) => {
+  .delete(authenticate.verifyUser, (req, res, next) => {
     Campsite.findById(req.params.campsiteId)
       .then((campsite) => {
+        const commentToDelete = campsite.comments.id(req.params.commentId);
+
+        if (!commentToDelete.author.equals(req.user._id)) {
+          const err = {
+            status: 403,
+            message:
+              'User id does not match and this user cannot delete this comment',
+          };
+          next(err);
+          return;
+        }
+
         if (campsite && campsite.comments.id(req.params.commentId)) {
           campsite.comments.id(req.params.commentId).remove();
           campsite
