@@ -84,6 +84,7 @@ campsiteRouter
       })
       .catch((err) => next(err));
   });
+
 campsiteRouter
   .route('/:campsiteId/comments')
   .get((req, res, next) => {
@@ -154,9 +155,19 @@ campsiteRouter
       .catch((err) => next(err));
   });
 
+// user/author id 6085adf520c821ac3bd2372f
+// comment id 6085b172720165ad6e27236a
+
 campsiteRouter
   .route('/:campsiteId/comments/:commentId')
   .get((req, res, next) => {
+    console.log({
+      line: '163',
+      user: req.user,
+      _id: req.user._id,
+      method: 'get',
+      route: '/:campsiteId/comments/:commentId',
+    });
     Campsite.findById(req.params.campsiteId)
       .populate('comments.author')
       .then((campsite) => {
@@ -183,8 +194,27 @@ campsiteRouter
     );
   })
   .put(authenticate.verifyUser, (req, res, next) => {
+    console.log({
+      line: '197',
+      user: req.user,
+      _id: req.user._id,
+      method: 'get',
+      route: '/:campsiteId/comments/:commentId',
+    });
+
     Campsite.findById(req.params.campsiteId)
       .then((campsite) => {
+        const commentToEdit = campsite.comments.id(req.params.commentId);
+
+        if (!commentToEdit.author.equals(req.user._id)) {
+          const err = {
+            status: 403,
+            message:
+              'User id does not match and this user cannot edit this comment',
+          };
+          next(err);
+        }
+
         if (campsite && campsite.comments.id(req.params.commentId)) {
           if (req.body.rating) {
             campsite.comments.id(req.params.commentId).rating = req.body.rating;
