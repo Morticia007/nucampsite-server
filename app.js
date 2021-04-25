@@ -13,8 +13,9 @@ const partnersRouter = require('./routes/partnersRouter');
 
 const FileStore = require('session-file-store')(session);
 const mongoose = require('mongoose');
+const config = require('./config');
 
-const url = 'mongodb://localhost:27017/nucampsite';
+const url = config.mongoUrl;
 const connect = mongoose.connect(url, {
   useCreateIndex: true,
   useFindAndModify: false,
