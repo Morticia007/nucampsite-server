@@ -3,7 +3,7 @@ const Promotions = require('../models/promotion');
 const authenticate = require('../authenticate');
 
 const promotionsRouter = express.Router();
-
+const authMiddleware = [authenticate.verifyUser, authenticate.verifyAdmin];
 promotionsRouter
   .route('/')
   .get((req, res, next) => {
@@ -15,7 +15,7 @@ promotionsRouter
       })
       .catch((err) => next(err));
   })
-  .post(authenticate.verifyUser, (req, res, next) => {
+  .post(authMiddleware, (req, res, next) => {
     Promotions.create(req.body)
       .then((promotions) => {
         console.log('Promotions Created ', promotions);
@@ -29,7 +29,7 @@ promotionsRouter
     res.statusCode = 403;
     res.send('PUT operation not supported on /promotions');
   })
-  .delete(authenticate.verifyUser, (req, res, next) => {
+  .delete(authMiddleware, (req, res, next) => {
     Promotions.deleteMany()
       .then((response) => {
         res.statusCode = 200;
@@ -56,7 +56,7 @@ promotionsRouter
       `POST operation not supported on /promotions/${req.params.promotionId}`,
     );
   })
-  .put(authenticate.verifyUser, (req, res, next) => {
+  .put(authMiddleware, (req, res, next) => {
     Promotions.findByIdAndUpdate(
       req.params.promotionId,
       {
@@ -71,7 +71,7 @@ promotionsRouter
       })
       .catch((err) => next(err));
   })
-  .delete(authenticate.verifyUser, (req, res, next) => {
+  .delete(authMiddleware, (req, res, next) => {
     Promotions.findByIdAndDelete(req.params.promotionId)
       .then((response) => {
         res.statusCode = 200;
