@@ -10,6 +10,7 @@ const usersRouter = require('./routes/usersRouter');
 const campsitesRouter = require('./routes/campsitesRouter');
 const promotionsRouter = require('./routes/promotionsRouter');
 const partnersRouter = require('./routes/partnersRouter');
+const uploadRouter = require('./routes/uploadRouter');
 
 const FileStore = require('session-file-store')(session);
 const mongoose = require('mongoose');
@@ -79,6 +80,7 @@ app.use('/users', usersRouter);
 app.use('/campsites', campsitesRouter);
 app.use('/promotions', promotionsRouter);
 app.use('/partners', partnersRouter);
+app.use('/imageUpload', uploadRouter);
 
 app.use(function (req, res, next) {
   next(createError(404));
