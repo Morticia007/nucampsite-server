@@ -1,6 +1,7 @@
 const express = require('express');
 const Partners = require('../models/partner');
 const authenticate = require('../authenticate');
+const cors = require('./cors');
 
 const partnersRouter = express.Router();
 
@@ -8,7 +9,8 @@ const authMiddleware = [authenticate.verifyUser, authenticate.verifyAdmin];
 
 partnersRouter
   .route('/')
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors, (req, res, next) => {
     Partners.find()
       .then((partners) => {
         res.statusCode = 200;
@@ -17,7 +19,7 @@ partnersRouter
       })
       .catch((err) => next(err));
   })
-  .post(authMiddleware, (req, res, next) => {
+  .post(cors.corsWithOptions, authMiddleware, (req, res, next) => {
     Partners.create(req.body)
       .then((partners) => {
         console.log('Partners Created ', partners);
@@ -27,11 +29,11 @@ partnersRouter
       })
       .catch((err) => next(err));
   })
-  .put(authenticate.verifyUser, (req, res) => {
+  .put(cors.corsWithOptions, authMiddleware, (req, res) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /partners');
   })
-  .delete(authMiddleware, (req, res, next) => {
+  .delete(cors.corsWithOptions, authMiddleware, (req, res, next) => {
     Partners.deleteMany()
       .then((response) => {
         res.statusCode = 200;
@@ -43,7 +45,8 @@ partnersRouter
 
 partnersRouter
   .route('/:partnerId')
-  .get((req, res, next) => {
+  .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+  .get(cors.cors, (req, res, next) => {
     Partners.findById(req.params.partnerId)
       .then((partners) => {
         res.statusCode = 200;
@@ -52,13 +55,13 @@ partnersRouter
       })
       .catch((err) => next(err));
   })
-  .post(authenticate.verifyUser, (req, res) => {
+  .post(cors.corsWithOptions, authMiddleware, (req, res) => {
     res.statusCode = 403;
     res.end(
       `POST operation not supported on /partners/${req.params.partnerId}`,
     );
   })
-  .put(authMiddleware, (req, res, next) => {
+  .put(cors.corsWithOptions, authMiddleware, (req, res, next) => {
     Partners.findByIdAndUpdate(
       req.params.partnerId,
       {
@@ -73,7 +76,7 @@ partnersRouter
       })
       .catch((err) => next(err));
   })
-  .delete(authMiddleware, (req, res, next) => {
+  .delete(cors.corsWithOptions, authMiddleware, (req, res, next) => {
     Partners.findByIdAndDelete(req.params.partnerId)
       .then((response) => {
         res.statusCode = 200;
