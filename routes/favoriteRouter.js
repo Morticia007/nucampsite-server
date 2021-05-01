@@ -184,18 +184,3 @@ favoriteRouter
   });
 
 module.exports = favoriteRouter;
-// Favorite.findOneAndDelete({ user: req.user._id })
-//       .then((response) => {
-//         console.log({ response });
-//         if (response) {
-//           (res.statusCode = 200),
-//             res.setHeader('Content-Type', 'application/json');
-//           res.json(response);
-//           console.log('you do not have any favorites to delete');
-//         } else {
-//           res.setHeader('Content-Type', 'text/plain');
-//           res.end(fav);
-//           ('you do not have any favorites to delete');
-//         }
-//       })
-//       .catch((err) => next(err));
