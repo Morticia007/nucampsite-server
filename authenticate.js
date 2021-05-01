@@ -56,7 +56,7 @@ exports.verifyAdmin = (req, res, next) => {
       status: 403,
       message: 'You are not authorized to perform this operation!',
     };
-    next(err);
+    return err;
   }
   next();
 };

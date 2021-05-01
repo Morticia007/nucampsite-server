@@ -8,6 +8,21 @@ const { response } = require('express');
 const favoriteRouter = express.Router();
 const authMiddleware = [authenticate.verifyUser, authenticate.verifyAdmin];
 
+function findMatches(firstArray, defaultArray) {
+  console.log({
+    firstArray,
+    defaultArray,
+  });
+  let sortedArray = [];
+  let values = firstArray.map((item) => Object.values(item));
+  values = values.flat();
+  console.log({ values });
+  values.map((first) => {
+    sortedArray[defaultArray.findIndex((def) => def === first)] = first;
+  });
+  return sortedArray.filter((v) => v._id);
+}
+
 favoriteRouter
   .route('/')
   .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
@@ -35,6 +50,15 @@ favoriteRouter
           message: 'No User Found',
         });
       }
+      //favorite.campsites
+      Favorite.findOne({ user: req.user._id }).then((favorite) => {
+        const matchResult = findMatches(req.body, favorite.campsites);
+        res.send({
+          matchResult,
+          favorite,
+          campsites: favorite.campsites,
+        });
+      });
       Favorite.create({
         campsites: req.body.campsites,
         user: req.user._id,
