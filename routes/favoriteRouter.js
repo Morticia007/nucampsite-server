@@ -42,22 +42,44 @@ favoriteRouter
       })
       .catch((err) => next(err));
   })
-  .post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
-    User.findOne({ user: req.user._id }).then((favorite) => {
+  .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    console.log({
+      userId: req.user._id,
+    });
+    Favorite.findOne({ user: req.user._id }).then((favorite) => {
+      console.log({
+        favorite,
+      });
+      // const err = {
+      //   statusCode: 404,
+      //   message: `No Favorite found for this user ${req.user._id}`,
+      // };
+      // if (!favorite) {
+      //   next(err);
+      //   return;
+      // }
+      console.log({
+        line: '48',
+        favorite,
+      });
       if (favorite) {
-        req.body.foreach((campsite) => {
+        console.log({ favorite });
+        req.body.forEach((campsite) => {
+          console.log({
+            campsite,
+            favoriteIsNotIncluded: !favorite.campsites.includes(campsite._id),
+          });
           if (!favorite.campsites.includes(campsite._id)) {
             favorite.campsites.push(campsite._id);
+            favorite.save().then((fav) => {
+              res.statusCode = 200;
+              res.setHeader('Content-Type', 'application/json');
+              res.json(fav);
+            });
           }
         });
-        favorite.save().then((fav) => {
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'application/json');
-          res.json(fav);
-        })
       } else {
-        favorite
-          .create({ user: req.user._id })
+        Favorite.create({ user: req.user._id })
           .then((favorite) => {
             req.body.foreach((campsite) => {
               if (!favorite.campsites.includes(campsite._id)) {
@@ -74,29 +96,26 @@ favoriteRouter
       }
     });
   })
-  .put(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
+  .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end('PUT operation not supported on /favorites');
   })
-  .delete(
-    cors.corsWithOptions,authenticate.verifyUser, (req, res) => {
-      Favorite.findOneAndDelete({ user: req.user._id}).then((response) => {
-       if (response) {
-          res.statusCode = 200,
-          res.setHeader('Content-Type', 'application/json');
-          res.json(response); ('you do not have any favorites to delete')
-       } else {
-        res.setHeader('Content-Type', 'text/plain');
-        res.end(fav); ('you do not have any favorites to delete')
-       }
-        })
-        .catch(err => next (err))
+  .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    Favorite.findOneAndDelete({ user: req.user._id })
+      .then((result) => {
+        res.send({
+          message: `Successfully deleted campsites ${result.campsites} for user ${req.user.username}`,
+        });
       })
- 
+      .catch((error) => {
+        next(error);
+      });
+  });
+
 favoriteRouter
   .route('/:campsiteId')
   .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
-  .get(cors.cors, authenticate.verifyUser, (req, res) => {
+  .get(cors.cors, authenticate.verifyUser, (req, res, next) => {
     res.statusCode = 403;
     res.end('Get operation not supported on /favorites');
   })
@@ -112,7 +131,7 @@ favoriteRouter
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
           res.json(fav);
-        })
+        });
       } else {
         favorite
           .create({ user: req.user._id })
@@ -138,26 +157,45 @@ favoriteRouter
   })
 
   .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    Favorite.findOne({user: req.user._id}).then(favorite => {
+    Favorite.findOne({ user: req.user._id }).then((favorite) => {
+      console.log({
+        favorite,
+      });
       if (favorite) {
-        const index = favorite.campsites.indexOf(req.params.campsiteId)
+        const index = favorite.campsites.indexOf(req.params.campsiteId);
+        console.log({ index });
         if (index >= 0) {
-          favorite.campsites.splice(index, 1)
+          favorite.campsites.splice(index, 1);
+          favorite.save().then((fav) => {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(fav);
+          });
         }
-        favorite.save().then (fav => {
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'application/json');
-          res.json(fav);
-        })
       } else {
-        favorite.save().then (fav => {
+        favorite.save().then((fav) => {
           res.statusCode = 200;
-          res.setHeader('Content-Type', 'text/plain')
-          res.end('you do not have any favorites to delete')
-        }
-      })
-    })
-     
-      
-    
+          res.setHeader('Content-Type', 'text/plain');
+          res.end('you do not have any favorites to delete');
+        });
+        s;
+      }
+    });
+  });
+
 module.exports = favoriteRouter;
+// Favorite.findOneAndDelete({ user: req.user._id })
+//       .then((response) => {
+//         console.log({ response });
+//         if (response) {
+//           (res.statusCode = 200),
+//             res.setHeader('Content-Type', 'application/json');
+//           res.json(response);
+//           console.log('you do not have any favorites to delete');
+//         } else {
+//           res.setHeader('Content-Type', 'text/plain');
+//           res.end(fav);
+//           ('you do not have any favorites to delete');
+//         }
+//       })
+//       .catch((err) => next(err));
